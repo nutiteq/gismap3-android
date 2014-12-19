@@ -6,12 +6,11 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.nutiteq.core.MapBounds;
 import com.nutiteq.core.MapPos;
 import com.nutiteq.core.MapRange;
-import com.nutiteq.core.ScreenBounds;
-import com.nutiteq.core.ScreenPos;
 import com.nutiteq.datasources.LocalVectorDataSource;
 import com.nutiteq.datasources.OGRVectorDataSource;
 import com.nutiteq.graphics.Color;
@@ -118,17 +117,24 @@ public class MainActivity extends Activity {
         vectorLayer1.setVisibleZoomRange(new MapRange(0, 24)); // this is optional, by default layer is visible for all zoom levels
         
         // Copy sample shape file from assets folder to SDCard
-        String localDir = getExternalFilesDir(null).toString();
+        String localDir = getFilesDir().toString();
         try {
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.shp", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.dbf", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.prj", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.shx", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "points.shp", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "points.dbf", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "points.prj", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "points.shx", localDir);
 
 			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shp", localDir);
 			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.dbf", localDir);
 			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.prj", localDir);
 			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shx", localDir);
+			
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.tab", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.DAT", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.ID", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.MAP", localDir);
+            			
+			
         } catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -160,11 +166,12 @@ public class MainActivity extends Activity {
         
         // Create data source. Use constructed style selector and copied shape file containing points.
         //OGRVectorDataSource.SetConfigOption("SHAPE_ENCODING", "CP1254");
-        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/bina_polyon.shp");
+        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/maakond_20130401.tab");
         ogrDataSource.setCodePage("CP1254");
         MapBounds bounds = ogrDataSource.getDataExtent();
+        Log.d("nutiteq","bounds:"+bounds.toString());
         mapView.setFocusPos(bounds.getCenter(), 0.0f);
-        mapView.setZoom(13.0f, 0.0f);
+        mapView.setZoom(5.0f, 0.0f);
 
         // Create vector layer using OGR data source
         VectorLayer ogrLayer = new VectorLayer(ogrDataSource);
