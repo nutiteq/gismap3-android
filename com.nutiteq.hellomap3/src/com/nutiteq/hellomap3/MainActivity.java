@@ -77,6 +77,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        // TODO: in order to get background map working, add RegisterLicense
 
         // 1. Basic map setup
         // Create map view 
@@ -91,7 +93,7 @@ public class MainActivity extends Activity {
         mapView.getOptions().setTileThreadPoolSize(2); // use 2 download threads for tile downloading
 
         // Create base layer. Use registered Nutiteq API key and vector style from assets (osmbright.zip)
-        VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("15cd9131072d6df68b8a54feda5b0496", "osmbright.zip");
+        VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("osmbright.zip");
         mapView.getLayers().add(baseLayer);
                 
         // 2. Add a pin marker to map
@@ -152,7 +154,7 @@ public class MainActivity extends Activity {
 
         // Create polygon style
         PolygonStyleBuilder polygonStyleBuilder = new PolygonStyleBuilder();
-        polygonStyleBuilder.setColor(new Color(0xff00ff00));
+        polygonStyleBuilder.setColor(new Color(0xff00ffff));
         PolygonStyle polygonStyle = polygonStyleBuilder.buildStyle();
         
         // Create style selector.
@@ -166,12 +168,12 @@ public class MainActivity extends Activity {
         
         // Create data source. Use constructed style selector and copied shape file containing points.
         //OGRVectorDataSource.SetConfigOption("SHAPE_ENCODING", "CP1254");
-        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/maakond_20130401.tab");
-        ogrDataSource.setCodePage("CP1254");
+        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/bina_polyon.shp");
+        //ogrDataSource.setCodePage("CP1254");
         MapBounds bounds = ogrDataSource.getDataExtent();
         Log.d("nutiteq","bounds:"+bounds.toString());
         mapView.setFocusPos(bounds.getCenter(), 0.0f);
-        mapView.setZoom(5.0f, 0.0f);
+        mapView.setZoom(15.0f, 0.0f);
 
         // Create vector layer using OGR data source
         VectorLayer ogrLayer = new VectorLayer(ogrDataSource);
