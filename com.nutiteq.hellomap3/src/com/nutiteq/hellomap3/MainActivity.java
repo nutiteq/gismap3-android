@@ -13,12 +13,15 @@ import com.nutiteq.core.MapPos;
 import com.nutiteq.core.MapRange;
 import com.nutiteq.datasources.LocalVectorDataSource;
 import com.nutiteq.datasources.OGRVectorDataSource;
+import com.nutiteq.gismap3.R;
 import com.nutiteq.graphics.Color;
 import com.nutiteq.layers.NutiteqOnlineVectorTileLayer;
 import com.nutiteq.layers.VectorLayer;
 import com.nutiteq.layers.VectorTileLayer;
 import com.nutiteq.projections.EPSG3857;
 import com.nutiteq.styles.BalloonPopupStyleBuilder;
+import com.nutiteq.styles.LineStyle;
+import com.nutiteq.styles.LineStyleBuilder;
 import com.nutiteq.styles.MarkerStyle;
 import com.nutiteq.styles.MarkerStyleBuilder;
 import com.nutiteq.styles.PolygonStyle;
@@ -55,6 +58,7 @@ public class MainActivity extends Activity {
 			if (stringMap.size() > 0) {
 				StringBuilder msgBuilder = new StringBuilder();
 				for (int i = 0; i < stringMap.size(); i++) {
+				    Log.d("nutiteq",""+stringMap.get_key(i)+" = "+stringMap.get(stringMap.get_key(i)));
 					msgBuilder.append(stringMap.get_key(i));
 					msgBuilder.append("=");
 					msgBuilder.append(stringMap.get(stringMap.get_key(i)));
@@ -124,15 +128,20 @@ public class MainActivity extends Activity {
 //			AssetCopy.copyAssetToSDCard(getAssets(), "points.prj", localDir);
 //			AssetCopy.copyAssetToSDCard(getAssets(), "points.shx", localDir);
 
-			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shp", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.dbf", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.prj", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shx", localDir);
-			
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.tab", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.DAT", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.ID", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.MAP", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shp", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.dbf", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.prj", localDir);
+//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shx", localDir);
+//			
+//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.tab", localDir);
+//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.DAT", localDir);
+//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.ID", localDir);
+//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.MAP", localDir);
+            
+            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.shp", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.dbf", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.prj", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.shx", localDir);
             			
 			
         } catch (IOException e) {
@@ -151,9 +160,21 @@ public class MainActivity extends Activity {
         */
 
         // Create polygon style
-        PolygonStyleBuilder polygonStyleBuilder = new PolygonStyleBuilder();
-        polygonStyleBuilder.setColor(new Color(0xff00ff00));
-        PolygonStyle polygonStyle = polygonStyleBuilder.buildStyle();
+//        PolygonStyleBuilder polygonStyleBuilder = new PolygonStyleBuilder();
+//        polygonStyleBuilder.setColor(new Color(0xff00ff00));
+//        PolygonStyle polygonStyle = polygonStyleBuilder.buildStyle();
+
+        // Create line style
+        LineStyleBuilder lineStyleBuilder = new LineStyleBuilder();
+        lineStyleBuilder.setColor(new Color(0xff00ff00));
+        lineStyleBuilder.setWidth(12.0f);
+        LineStyle lineStyle = lineStyleBuilder.buildStyle();
+        
+        lineStyleBuilder.setColor(new Color(0xffff0000));
+        LineStyle lineStyle2 = lineStyleBuilder.buildStyle();
+        
+        lineStyleBuilder.setColor(new Color(0xffffff00));
+        LineStyle lineStyle3 = lineStyleBuilder.buildStyle();
         
         // Create style selector.
         // Style selectors allow to assign styles based on element attributes and view parameters (zoom, for example)
@@ -161,17 +182,24 @@ public class MainActivity extends Activity {
         StyleSelectorBuilder styleSelectorBuilder = new StyleSelectorBuilder()
         		//.addRule("type='cafe' OR type='restaurant'", pointStyleBig) // 'type' is a member of geometry meta data
         		//.addRule(pointStyleSmall);
-        		.addRule(polygonStyle);
+//                .addRule("ROADTYPE = 1", lineStyle)
+//        		.addRule("ROADTYPE = 2", lineStyle2)
+//        		.addRule("ROADTYPE = 3", lineStyle3)
+        		.addRule(lineStyle);
         StyleSelector styleSelector = styleSelectorBuilder.buildSelector();
         
         // Create data source. Use constructed style selector and copied shape file containing points.
         //OGRVectorDataSource.SetConfigOption("SHAPE_ENCODING", "CP1254");
-        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/maakond_20130401.tab");
+        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/DRN_sample_polyline.shp");
         ogrDataSource.setCodePage("CP1254");
         MapBounds bounds = ogrDataSource.getDataExtent();
+        
+        Log.d("nutiteq","features:" + ogrDataSource.getFeatureCount());
         Log.d("nutiteq","bounds:"+bounds.toString());
+//        mapView.setFocusPos(proj.fromWgs84(bounds.getCenter()), 0.0f);
         mapView.setFocusPos(bounds.getCenter(), 0.0f);
-        mapView.setZoom(5.0f, 0.0f);
+        mapView.setZoom(23.0f, 0.0f);
+        
 
         // Create vector layer using OGR data source
         VectorLayer ogrLayer = new VectorLayer(ogrDataSource);
