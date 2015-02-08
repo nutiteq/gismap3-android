@@ -24,6 +24,8 @@ import com.nutiteq.styles.LineStyle;
 import com.nutiteq.styles.LineStyleBuilder;
 import com.nutiteq.styles.MarkerStyle;
 import com.nutiteq.styles.MarkerStyleBuilder;
+import com.nutiteq.styles.PointStyle;
+import com.nutiteq.styles.PointStyleBuilder;
 import com.nutiteq.styles.PolygonStyle;
 import com.nutiteq.styles.PolygonStyleBuilder;
 import com.nutiteq.styles.StyleSelector;
@@ -81,6 +83,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        // Get your own license from developer.nutiteq.com
+        MapView.RegisterLicense("XTUN3Q0ZBd2NtcmFxbUJtT1h4QnlIZ2F2ZXR0Mi9TY2JBaFJoZDNtTjUvSjJLay9aNUdSVjdnMnJwVXduQnc9PQoKcHJvZHVjdHM9c2RrLWlvcy0zLiosc2RrLWFuZHJvaWQtMy4qCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLioKYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS4qCndhdGVybWFyaz1ldmFsdWF0aW9uCnVzZXJLZXk9MTVjZDkxMzEwNzJkNmRmNjhiOGE1NGZlZGE1YjA0OTYK", getApplicationContext());
 
         // 1. Basic map setup
         // Create map view 
@@ -95,7 +100,7 @@ public class MainActivity extends Activity {
         mapView.getOptions().setTileThreadPoolSize(2); // use 2 download threads for tile downloading
 
         // Create base layer. Use registered Nutiteq API key and vector style from assets (osmbright.zip)
-        VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("15cd9131072d6df68b8a54feda5b0496", "osmbright.zip");
+        VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("osmbright.zip");
         mapView.getLayers().add(baseLayer);
                 
         // 2. Add a pin marker to map
@@ -123,32 +128,28 @@ public class MainActivity extends Activity {
         // Copy sample shape file from assets folder to SDCard
         String localDir = getFilesDir().toString();
         try {
-//			AssetCopy.copyAssetToSDCard(getAssets(), "points.shp", localDir);
-//			AssetCopy.copyAssetToSDCard(getAssets(), "points.dbf", localDir);
-//			AssetCopy.copyAssetToSDCard(getAssets(), "points.prj", localDir);
-//			AssetCopy.copyAssetToSDCard(getAssets(), "points.shx", localDir);
-
-//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shp", localDir);
-//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.dbf", localDir);
-//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.prj", localDir);
-//			AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shx", localDir);
-//			
-//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.tab", localDir);
-//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.DAT", localDir);
-//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.ID", localDir);
-//            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.MAP", localDir);
+			AssetCopy.copyAssetToSDCard(getAssets(), "points.shp", localDir);
+			AssetCopy.copyAssetToSDCard(getAssets(), "points.dbf", localDir);
+			AssetCopy.copyAssetToSDCard(getAssets(), "points.prj", localDir);
+			AssetCopy.copyAssetToSDCard(getAssets(), "points.shx", localDir);
+			
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.tab", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.DAT", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.ID", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.MAP", localDir);
             
             AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.shp", localDir);
             AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.dbf", localDir);
             AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.prj", localDir);
             AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.shx", localDir);
-            			
+
+            
 			
         } catch (IOException e) {
 			e.printStackTrace();
 		}
 
-        /*
+        
         // Create sample point styles, one for cafes/restaurants, the other for all other POIs
         PointStyleBuilder pointStyleBuilder = new PointStyleBuilder();
         pointStyleBuilder.setColor(new Color(0xffff0000)); // fully opaque, red
@@ -157,19 +158,19 @@ public class MainActivity extends Activity {
         pointStyleBuilder.setColor(new Color(0x7f7f0000)); // half-transparent, red
         pointStyleBuilder.setSize(3.0f);
         PointStyle pointStyleSmall = pointStyleBuilder.buildStyle();
-        */
+        
 
         // Create polygon style
-//        PolygonStyleBuilder polygonStyleBuilder = new PolygonStyleBuilder();
-//        polygonStyleBuilder.setColor(new Color(0xff00ff00));
-//        PolygonStyle polygonStyle = polygonStyleBuilder.buildStyle();
+        PolygonStyleBuilder polygonStyleBuilder = new PolygonStyleBuilder();
+        polygonStyleBuilder.setColor(new Color(0xff00ff00));
+        PolygonStyle polygonStyle = polygonStyleBuilder.buildStyle();
 
         // Create line style
         LineStyleBuilder lineStyleBuilder = new LineStyleBuilder();
         lineStyleBuilder.setColor(new Color(0xff00ff00));
         lineStyleBuilder.setWidth(12.0f);
         LineStyle lineStyle = lineStyleBuilder.buildStyle();
-        
+                
         lineStyleBuilder.setColor(new Color(0xffff0000));
         LineStyle lineStyle2 = lineStyleBuilder.buildStyle();
         
@@ -180,12 +181,13 @@ public class MainActivity extends Activity {
         // Style selectors allow to assign styles based on element attributes and view parameters (zoom, for example)
         // Style filter expressions are given in a simple SQL-like language.
         StyleSelectorBuilder styleSelectorBuilder = new StyleSelectorBuilder()
-        		//.addRule("type='cafe' OR type='restaurant'", pointStyleBig) // 'type' is a member of geometry meta data
-        		//.addRule(pointStyleSmall);
+        		.addRule("type='cafe' OR type='restaurant'", pointStyleBig) // 'type' is a member of geometry meta data
+//        		.addRule(pointStyleSmall);
 //                .addRule("ROADTYPE = 1", lineStyle)
 //        		.addRule("ROADTYPE = 2", lineStyle2)
 //        		.addRule("ROADTYPE = 3", lineStyle3)
-        		.addRule(lineStyle);
+        		//.addRule(lineStyle);
+                .addRule(polygonStyle);
         StyleSelector styleSelector = styleSelectorBuilder.buildSelector();
         
         // Create data source. Use constructed style selector and copied shape file containing points.
@@ -196,10 +198,10 @@ public class MainActivity extends Activity {
         
         Log.d("nutiteq","features:" + ogrDataSource.getFeatureCount());
         Log.d("nutiteq","bounds:"+bounds.toString());
-//        mapView.setFocusPos(proj.fromWgs84(bounds.getCenter()), 0.0f);
-        mapView.setFocusPos(bounds.getCenter(), 0.0f);
-        mapView.setZoom(23.0f, 0.0f);
+        mapView.setFocusPos(proj.fromWgs84(bounds.getCenter()), 0.0f);
+//        mapView.setFocusPos(bounds.getCenter(), 0.0f);
         
+        mapView.setZoom(15.0f, 0.0f);
 
         // Create vector layer using OGR data source
         VectorLayer ogrLayer = new VectorLayer(ogrDataSource);
