@@ -6,11 +6,14 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.nutiteq.core.MapBounds;
 import com.nutiteq.core.MapPos;
 import com.nutiteq.core.MapRange;
+import com.nutiteq.core.ScreenBounds;
+import com.nutiteq.core.ScreenPos;
 import com.nutiteq.datasources.LocalVectorDataSource;
 import com.nutiteq.datasources.OGRVectorDataSource;
 import com.nutiteq.gismap3.R;
@@ -63,7 +66,7 @@ public class MainActivity extends Activity {
 				    Log.d("nutiteq",""+stringMap.get_key(i)+" = "+stringMap.get(stringMap.get_key(i)));
 					msgBuilder.append(stringMap.get_key(i));
 					msgBuilder.append("=");
-					msgBuilder.append(stringMap.get(stringMap.get_key(i)));
+					msgBuilder.append(fixTurkish(stringMap.get(stringMap.get_key(i))));
 					msgBuilder.append("\n");
 				}
 				BalloonPopupStyleBuilder styleBuilder = new BalloonPopupStyleBuilder();
@@ -75,6 +78,15 @@ public class MainActivity extends Activity {
 				popupDataSource.add(clickPopup);
 			}
 		}
+	}
+	
+	private static String fixTurkish(String in){
+	    return in.replaceAll("Ý", "İ")
+	            .replaceAll("ý", "ı")
+	            .replaceAll("Þ", "Ş")
+	            .replaceAll("þ", "ş")
+	            .replaceAll("Ð", "Ğ")
+	            .replaceAll("ð", "ğ");
 	}
 	
 	private LocalVectorDataSource popupDataSource;
@@ -128,23 +140,12 @@ public class MainActivity extends Activity {
         // Copy sample shape file from assets folder to SDCard
         String localDir = getFilesDir().toString();
         try {
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.shp", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.dbf", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.prj", localDir);
-			AssetCopy.copyAssetToSDCard(getAssets(), "points.shx", localDir);
-			
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.tab", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.DAT", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.ID", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "maakond_20130401.MAP", localDir);
             
-            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.shp", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.dbf", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.prj", localDir);
-            AssetCopy.copyAssetToSDCard(getAssets(), "DRN_sample_polyline.shx", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shp", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.dbf", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.prj", localDir);
+            AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shx", localDir);
 
-            
-			
         } catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,7 +169,7 @@ public class MainActivity extends Activity {
         // Create line style
         LineStyleBuilder lineStyleBuilder = new LineStyleBuilder();
         lineStyleBuilder.setColor(new Color(0xff00ff00));
-        lineStyleBuilder.setWidth(12.0f);
+        lineStyleBuilder.setWidth(2.0f);
         LineStyle lineStyle = lineStyleBuilder.buildStyle();
                 
         lineStyleBuilder.setColor(new Color(0xffff0000));
@@ -181,27 +182,33 @@ public class MainActivity extends Activity {
         // Style selectors allow to assign styles based on element attributes and view parameters (zoom, for example)
         // Style filter expressions are given in a simple SQL-like language.
         StyleSelectorBuilder styleSelectorBuilder = new StyleSelectorBuilder()
-        		.addRule("type='cafe' OR type='restaurant'", pointStyleBig) // 'type' is a member of geometry meta data
-//        		.addRule(pointStyleSmall);
-//                .addRule("ROADTYPE = 1", lineStyle)
+//        		.addRule("type='cafe' OR type='restaurant'", pointStyleBig) // 'type' is a member of geometry meta data
+//        		.addRule(pointStyleSmall)
+//              .addRule("ROADTYPE = 1", lineStyle)
 //        		.addRule("ROADTYPE = 2", lineStyle2)
 //        		.addRule("ROADTYPE = 3", lineStyle3)
-        		//.addRule(lineStyle);
+//        		.addRule(lineStyle);
                 .addRule(polygonStyle);
         StyleSelector styleSelector = styleSelectorBuilder.buildSelector();
         
         // Create data source. Use constructed style selector and copied shape file containing points.
-        //OGRVectorDataSource.SetConfigOption("SHAPE_ENCODING", "CP1254");
-        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/DRN_sample_polyline.shp");
-        ogrDataSource.setCodePage("CP1254");
+        OGRVectorDataSource.SetConfigOption("SHAPE_ENCODING", "ISO8859_1");
+        OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/bina_polyon.shp");
+//        ogrDataSource.setCodePage("CP1254");
         MapBounds bounds = ogrDataSource.getDataExtent();
         
         Log.d("nutiteq","features:" + ogrDataSource.getFeatureCount());
         Log.d("nutiteq","bounds:"+bounds.toString());
-        mapView.setFocusPos(proj.fromWgs84(bounds.getCenter()), 0.0f);
-//        mapView.setFocusPos(bounds.getCenter(), 0.0f);
         
-        mapView.setZoom(15.0f, 0.0f);
+        
+        // Fit to bounds
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int height = displaymetrics.heightPixels;
+        int width = displaymetrics.widthPixels;
+
+        mapView.moveToFitBounds(bounds,
+                new ScreenBounds(new ScreenPos(0, 0), new ScreenPos(width, height)),false, 0.5f);
 
         // Create vector layer using OGR data source
         VectorLayer ogrLayer = new VectorLayer(ogrDataSource);
