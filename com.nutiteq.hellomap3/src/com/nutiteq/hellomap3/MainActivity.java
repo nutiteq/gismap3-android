@@ -81,12 +81,12 @@ public class MainActivity extends Activity {
 	}
 	
 	private static String fixTurkish(String in){
-	    return in.replaceAll("Ý", "İ")
-	            .replaceAll("ý", "ı")
-	            .replaceAll("Þ", "Ş")
-	            .replaceAll("þ", "ş")
-	            .replaceAll("Ð", "Ğ")
-	            .replaceAll("ð", "ğ");
+	    return in.replaceAll("��", "��")
+	            .replaceAll("��", "��")
+	            .replaceAll("��", "��")
+	            .replaceAll("��", "��")
+	            .replaceAll("��", "��")
+	            .replaceAll("��", "��");
 	}
 	
 	private LocalVectorDataSource popupDataSource;
@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         
         // Get your own license from developer.nutiteq.com
-        MapView.RegisterLicense("XTUN3Q0ZBd2NtcmFxbUJtT1h4QnlIZ2F2ZXR0Mi9TY2JBaFJoZDNtTjUvSjJLay9aNUdSVjdnMnJwVXduQnc9PQoKcHJvZHVjdHM9c2RrLWlvcy0zLiosc2RrLWFuZHJvaWQtMy4qCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLioKYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS4qCndhdGVybWFyaz1ldmFsdWF0aW9uCnVzZXJLZXk9MTVjZDkxMzEwNzJkNmRmNjhiOGE1NGZlZGE1YjA0OTYK", getApplicationContext());
+        MapView.registerLicense("XTUN3Q0ZBd2NtcmFxbUJtT1h4QnlIZ2F2ZXR0Mi9TY2JBaFJoZDNtTjUvSjJLay9aNUdSVjdnMnJwVXduQnc9PQoKcHJvZHVjdHM9c2RrLWlvcy0zLiosc2RrLWFuZHJvaWQtMy4qCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLioKYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS4qCndhdGVybWFyaz1ldmFsdWF0aW9uCnVzZXJLZXk9MTVjZDkxMzEwNzJkNmRmNjhiOGE1NGZlZGE1YjA0OTYK", getApplicationContext());
 
         // 1. Basic map setup
         // Create map view 
@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
         
         // Create marker style, by first loading marker bitmap
         Bitmap androidMarkerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
-        com.nutiteq.graphics.Bitmap markerBitmap = BitmapUtils.CreateBitmapFromAndroidBitmap(androidMarkerBitmap);        
+        com.nutiteq.graphics.Bitmap markerBitmap = BitmapUtils.createBitmapFromAndroidBitmap(androidMarkerBitmap);        
         MarkerStyleBuilder markerStyleBuilder = new MarkerStyleBuilder();
         markerStyleBuilder.setBitmap(markerBitmap);
         markerStyleBuilder.setSize(30);
@@ -167,32 +167,32 @@ public class MainActivity extends Activity {
         PolygonStyle polygonStyle = polygonStyleBuilder.buildStyle();
 
         // Create line style
-        LineStyleBuilder lineStyleBuilder = new LineStyleBuilder();
-        lineStyleBuilder.setColor(new Color(0xff00ff00));
-        lineStyleBuilder.setWidth(2.0f);
-        LineStyle lineStyle = lineStyleBuilder.buildStyle();
+//        LineStyleBuilder lineStyleBuilder = new LineStyleBuilder();
+//        lineStyleBuilder.setColor(new Color(0xff00ff00));
+//        lineStyleBuilder.setWidth(2.0f);
+//        LineStyle lineStyle = lineStyleBuilder.buildStyle();
                 
-        lineStyleBuilder.setColor(new Color(0xffff0000));
-        LineStyle lineStyle2 = lineStyleBuilder.buildStyle();
+//        lineStyleBuilder.setColor(new Color(0xffff0000));
+//        LineStyle lineStyle2 = lineStyleBuilder.buildStyle();
         
-        lineStyleBuilder.setColor(new Color(0xffffff00));
-        LineStyle lineStyle3 = lineStyleBuilder.buildStyle();
+//        lineStyleBuilder.setColor(new Color(0xffffff00));
+//        LineStyle lineStyle3 = lineStyleBuilder.buildStyle();
         
         // Create style selector.
         // Style selectors allow to assign styles based on element attributes and view parameters (zoom, for example)
         // Style filter expressions are given in a simple SQL-like language.
-        StyleSelectorBuilder styleSelectorBuilder = new StyleSelectorBuilder()
-//        		.addRule("type='cafe' OR type='restaurant'", pointStyleBig) // 'type' is a member of geometry meta data
-//        		.addRule(pointStyleSmall)
-//              .addRule("ROADTYPE = 1", lineStyle)
-//        		.addRule("ROADTYPE = 2", lineStyle2)
-//        		.addRule("ROADTYPE = 3", lineStyle3)
-//        		.addRule(lineStyle);
-                .addRule(polygonStyle);
+        StyleSelectorBuilder styleSelectorBuilder = new StyleSelectorBuilder();
+//      styleSelectorBuilder.addRule("type='cafe' OR type='restaurant'", pointStyleBig) // 'type' is a member of geometry meta data
+//      styleSelectorBuilder.addRule(pointStyleSmall)
+//      styleSelectorBuilder.addRule("ROADTYPE = 1", lineStyle)
+//      styleSelectorBuilder.addRule("ROADTYPE = 2", lineStyle2)
+//      styleSelectorBuilder.addRule("ROADTYPE = 3", lineStyle3)
+//      styleSelectorBuilder.addRule(lineStyle);
+        styleSelectorBuilder.addRule(polygonStyle);
         StyleSelector styleSelector = styleSelectorBuilder.buildSelector();
         
         // Create data source. Use constructed style selector and copied shape file containing points.
-        OGRVectorDataSource.SetConfigOption("SHAPE_ENCODING", "ISO8859_1");
+        OGRVectorDataSource.setConfigOption("SHAPE_ENCODING", "ISO8859_1");
         OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/bina_polyon.shp");
 //        ogrDataSource.setCodePage("CP1254");
         MapBounds bounds = ogrDataSource.getDataExtent();
