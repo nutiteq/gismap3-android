@@ -7,21 +7,23 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 import com.nutiteq.core.MapBounds;
 import com.nutiteq.core.MapPos;
 import com.nutiteq.core.MapRange;
 import com.nutiteq.core.ScreenBounds;
 import com.nutiteq.core.ScreenPos;
+import com.nutiteq.datasources.GDALRasterTileDataSource;
 import com.nutiteq.datasources.LocalVectorDataSource;
 import com.nutiteq.datasources.OGRVectorDataSource;
 import com.nutiteq.gismap3.R;
 import com.nutiteq.graphics.Color;
 import com.nutiteq.layers.NutiteqOnlineVectorTileLayer;
+import com.nutiteq.layers.RasterTileLayer;
 import com.nutiteq.layers.VectorLayer;
 import com.nutiteq.layers.VectorTileLayer;
 import com.nutiteq.projections.EPSG3857;
+import com.nutiteq.projections.Projection;
 import com.nutiteq.styles.BalloonPopupStyleBuilder;
 import com.nutiteq.styles.LineStyle;
 import com.nutiteq.styles.LineStyleBuilder;
@@ -39,6 +41,7 @@ import com.nutiteq.ui.MapView;
 import com.nutiteq.ui.VectorElementClickInfo;
 import com.nutiteq.ui.VectorElementsClickInfo;
 import com.nutiteq.utils.BitmapUtils;
+import com.nutiteq.utils.Log;
 import com.nutiteq.vectorelements.BalloonPopup;
 import com.nutiteq.vectorelements.Marker;
 import com.nutiteq.wrappedcommons.StringMap;
@@ -63,7 +66,7 @@ public class MainActivity extends Activity {
 			if (stringMap.size() > 0) {
 				StringBuilder msgBuilder = new StringBuilder();
 				for (int i = 0; i < stringMap.size(); i++) {
-				    Log.d("nutiteq",""+stringMap.get_key(i)+" = "+stringMap.get(stringMap.get_key(i)));
+				    Log.debug(""+stringMap.get_key(i)+" = "+stringMap.get(stringMap.get_key(i)));
 					msgBuilder.append(stringMap.get_key(i));
 					msgBuilder.append("=");
 					msgBuilder.append(fixTurkish(stringMap.get(stringMap.get_key(i))));
@@ -91,30 +94,41 @@ public class MainActivity extends Activity {
 	
 	private LocalVectorDataSource popupDataSource;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	void testRaster(MapView mapView) {
+        String localDir = getFilesDir().toString();
+        try {
+            AssetCopy.copyAssetToSDCard(getAssets(), "test.tif", localDir);
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
         
-        // Get your own license from developer.nutiteq.com
-        MapView.registerLicense("XTUN3Q0ZBd2NtcmFxbUJtT1h4QnlIZ2F2ZXR0Mi9TY2JBaFJoZDNtTjUvSjJLay9aNUdSVjdnMnJwVXduQnc9PQoKcHJvZHVjdHM9c2RrLWlvcy0zLiosc2RrLWFuZHJvaWQtMy4qCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLioKYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS4qCndhdGVybWFyaz1ldmFsdWF0aW9uCnVzZXJLZXk9MTVjZDkxMzEwNzJkNmRmNjhiOGE1NGZlZGE1YjA0OTYK", getApplicationContext());
+        mapView.getOptions().setTileThreadPoolSize(2); // faster tile loading
 
-        // 1. Basic map setup
-        // Create map view 
-        MapView mapView = (MapView) this.findViewById(R.id.map_view);
-        
-        // Set the base projection, that will be used for most MapView, MapEventListener and Options methods
-        EPSG3857 proj = new EPSG3857();
-        mapView.getOptions().setBaseProjection(proj); // note: EPSG3857 is the default, so this is actually not required
-        
-        // General options
-        mapView.getOptions().setRotatable(true); // make map rotatable (this is also the default)
-        mapView.getOptions().setTileThreadPoolSize(2); // use 2 download threads for tile downloading
+        // Create GDAL raster tile layer
+		GDALRasterTileDataSource dataSource = new GDALRasterTileDataSource(0, 23, localDir + "/test.tif");
+		RasterTileLayer rasterLayer = new RasterTileLayer(dataSource);
+		mapView.getLayers().add(rasterLayer);
+		
+		// Calculate zoom bias, basically this is needed to 'undo' automatic DPI scaling, we will display original raster with close to 1:1 pixel density
+		double zoomLevelBias = Math.log(mapView.getOptions().getDPI() / 160) / Math.log(2);
+		rasterLayer.setZoomLevelBias((float) zoomLevelBias);
 
-        // Create base layer. Use registered Nutiteq API key and vector style from assets (osmbright.zip)
-        VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("osmbright.zip");
-        mapView.getLayers().add(baseLayer);
-                
+		// Find GDAL layer bounds
+		MapBounds bounds = dataSource.getDataExtent();
+
+        // Fit to bounds
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int height = displaymetrics.heightPixels;
+        int width = displaymetrics.widthPixels;
+
+        mapView.moveToFitBounds(bounds,
+                new ScreenBounds(new ScreenPos(0, 0), new ScreenPos(width, height)), false, 0.0f);
+	}
+	
+	void testVector(MapView mapView) {
+		Projection proj = new EPSG3857();
+        
         // 2. Add a pin marker to map
         // Initialize a local vector data source
         LocalVectorDataSource vectorDataSource1 = new LocalVectorDataSource(proj);
@@ -145,39 +159,36 @@ public class MainActivity extends Activity {
             AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.dbf", localDir);
             AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.prj", localDir);
             AssetCopy.copyAssetToSDCard(getAssets(), "bina_polyon.shx", localDir);
-
         } catch (IOException e) {
 			e.printStackTrace();
 		}
 
-        
         // Create sample point styles, one for cafes/restaurants, the other for all other POIs
-        PointStyleBuilder pointStyleBuilder = new PointStyleBuilder();
-        pointStyleBuilder.setColor(new Color(0xffff0000)); // fully opaque, red
-        pointStyleBuilder.setSize(5.0f);
-        PointStyle pointStyleBig = pointStyleBuilder.buildStyle();
-        pointStyleBuilder.setColor(new Color(0x7f7f0000)); // half-transparent, red
-        pointStyleBuilder.setSize(3.0f);
-        PointStyle pointStyleSmall = pointStyleBuilder.buildStyle();
+//      PointStyleBuilder pointStyleBuilder = new PointStyleBuilder();
+//      pointStyleBuilder.setColor(new Color(0xffff0000)); // fully opaque, red
+//      pointStyleBuilder.setSize(5.0f);
+//      PointStyle pointStyleBig = pointStyleBuilder.buildStyle();
+//      pointStyleBuilder.setColor(new Color(0x7f7f0000)); // half-transparent, red
+//      pointStyleBuilder.setSize(3.0f);
+//      PointStyle pointStyleSmall = pointStyleBuilder.buildStyle();
         
-
+        // Create line style
+//      LineStyleBuilder lineStyleBuilder = new LineStyleBuilder();
+//      lineStyleBuilder.setColor(new Color(0xff00ff00));
+//      lineStyleBuilder.setWidth(2.0f);
+//      LineStyle lineStyle = lineStyleBuilder.buildStyle();
+                
+//      lineStyleBuilder.setColor(new Color(0xffff0000));
+//      LineStyle lineStyle2 = lineStyleBuilder.buildStyle();
+        
+//      lineStyleBuilder.setColor(new Color(0xffffff00));
+//      LineStyle lineStyle3 = lineStyleBuilder.buildStyle();
+        
         // Create polygon style
         PolygonStyleBuilder polygonStyleBuilder = new PolygonStyleBuilder();
         polygonStyleBuilder.setColor(new Color(0xff00ff00));
         PolygonStyle polygonStyle = polygonStyleBuilder.buildStyle();
 
-        // Create line style
-//        LineStyleBuilder lineStyleBuilder = new LineStyleBuilder();
-//        lineStyleBuilder.setColor(new Color(0xff00ff00));
-//        lineStyleBuilder.setWidth(2.0f);
-//        LineStyle lineStyle = lineStyleBuilder.buildStyle();
-                
-//        lineStyleBuilder.setColor(new Color(0xffff0000));
-//        LineStyle lineStyle2 = lineStyleBuilder.buildStyle();
-        
-//        lineStyleBuilder.setColor(new Color(0xffffff00));
-//        LineStyle lineStyle3 = lineStyleBuilder.buildStyle();
-        
         // Create style selector.
         // Style selectors allow to assign styles based on element attributes and view parameters (zoom, for example)
         // Style filter expressions are given in a simple SQL-like language.
@@ -194,11 +205,11 @@ public class MainActivity extends Activity {
         // Create data source. Use constructed style selector and copied shape file containing points.
         OGRVectorDataSource.setConfigOption("SHAPE_ENCODING", "ISO8859_1");
         OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, localDir + "/bina_polyon.shp");
-//        ogrDataSource.setCodePage("CP1254");
+//      ogrDataSource.setCodePage("CP1254");
         MapBounds bounds = ogrDataSource.getDataExtent();
         
-        Log.d("nutiteq","features:" + ogrDataSource.getFeatureCount());
-        Log.d("nutiteq","bounds:"+bounds.toString());
+        Log.debug("features:" + ogrDataSource.getFeatureCount());
+        Log.debug("bounds:"+bounds.toString());
         
         
         // Fit to bounds
@@ -218,6 +229,37 @@ public class MainActivity extends Activity {
         popupDataSource = new LocalVectorDataSource(proj);
         VectorLayer popupLayer = new VectorLayer(popupDataSource);
         mapView.getLayers().add(popupLayer);
-        mapView.setMapEventListener(new ActivityMapEventListener());
+        mapView.setMapEventListener(new ActivityMapEventListener());		
+	}
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        Log.setShowInfo(true);
+        Log.setShowError(true);
+        
+        // Get your own license from developer.nutiteq.com
+        MapView.registerLicense("XTUN3Q0ZBd2NtcmFxbUJtT1h4QnlIZ2F2ZXR0Mi9TY2JBaFJoZDNtTjUvSjJLay9aNUdSVjdnMnJwVXduQnc9PQoKcHJvZHVjdHM9c2RrLWlvcy0zLiosc2RrLWFuZHJvaWQtMy4qCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLioKYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS4qCndhdGVybWFyaz1ldmFsdWF0aW9uCnVzZXJLZXk9MTVjZDkxMzEwNzJkNmRmNjhiOGE1NGZlZGE1YjA0OTYK", getApplicationContext());
+
+        // 1. Basic map setup
+        // Create map view 
+        MapView mapView = (MapView) this.findViewById(R.id.map_view);
+
+        // Set the base projection, that will be used for most MapView, MapEventListener and Options methods
+        EPSG3857 proj = new EPSG3857();
+        mapView.getOptions().setBaseProjection(proj); // note: EPSG3857 is the default, so this is actually not required
+        
+        // General options
+        mapView.getOptions().setRotatable(true); // make map rotatable (this is also the default)
+        mapView.getOptions().setTileThreadPoolSize(2); // use 2 download threads for tile downloading
+
+        // Create base layer. Use registered Nutiteq API key and vector style from assets (osmbright.zip)
+        VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("osmbright.zip");
+        mapView.getLayers().add(baseLayer);
+
+        testRaster(mapView);
+//      testVector(mapView);
     }
 }
