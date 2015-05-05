@@ -48,8 +48,19 @@ import com.nutiteq.wrappedcommons.StringMap;
 
 public class MainActivity extends Activity {
 	
+    static {
+        try {
+            // force Java to load PROJ.4 library. Needed as we don't call it directly, but 
+            // OGR datasource reading may need it.
+            System.loadLibrary("proj");
+        } catch (Throwable t) {
+            System.err.println("Unable to load proj: " + t);
+        }
+    }
+    
 	// Listener that displays vector element meta data as popups
 	class ActivityMapEventListener extends MapEventListener {
+	    
 		@Override
 		public void onMapMoved() {
 		}
