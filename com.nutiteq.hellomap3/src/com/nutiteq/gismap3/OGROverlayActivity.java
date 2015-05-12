@@ -1,4 +1,4 @@
-package com.nutiteq.hellomap3;
+package com.nutiteq.gismap3;
 
 import java.io.IOException;
 
@@ -13,13 +13,11 @@ import com.nutiteq.core.MapPos;
 import com.nutiteq.core.MapRange;
 import com.nutiteq.core.ScreenBounds;
 import com.nutiteq.core.ScreenPos;
-import com.nutiteq.datasources.GDALRasterTileDataSource;
 import com.nutiteq.datasources.LocalVectorDataSource;
 import com.nutiteq.datasources.OGRVectorDataSource;
 import com.nutiteq.gismap3.R;
 import com.nutiteq.graphics.Color;
 import com.nutiteq.layers.NutiteqOnlineVectorTileLayer;
-import com.nutiteq.layers.RasterTileLayer;
 import com.nutiteq.layers.VectorLayer;
 import com.nutiteq.layers.VectorTileLayer;
 import com.nutiteq.projections.EPSG3857;
@@ -46,7 +44,7 @@ import com.nutiteq.vectorelements.BalloonPopup;
 import com.nutiteq.vectorelements.Marker;
 import com.nutiteq.wrappedcommons.StringMap;
 
-public class MainActivity extends Activity {
+public class OGROverlayActivity extends Activity {
 	
     static {
         try {
@@ -95,48 +93,16 @@ public class MainActivity extends Activity {
 	}
 	
 	private static String fixTurkish(String in){
-	    return in.replaceAll("��", "��")
-	            .replaceAll("��", "��")
-	            .replaceAll("��", "��")
-	            .replaceAll("��", "��")
-	            .replaceAll("��", "��")
-	            .replaceAll("��", "��");
+	    return in.replaceAll("??????", "??????")
+	            .replaceAll("??????", "??????")
+	            .replaceAll("??????", "??????")
+	            .replaceAll("??????", "??????")
+	            .replaceAll("??????", "??????")
+	            .replaceAll("??????", "??????");
 	}
 	
 	private LocalVectorDataSource popupDataSource;
 
-	void testRaster(MapView mapView) {
-        String localDir = getFilesDir().toString();
-        try {
-            AssetCopy.copyAssetToSDCard(getAssets(), "test.tif", localDir);
-        } catch (IOException e) {
-			e.printStackTrace();
-		}
-        
-        mapView.getOptions().setTileThreadPoolSize(2); // faster tile loading
-
-        // Create GDAL raster tile layer
-		GDALRasterTileDataSource dataSource = new GDALRasterTileDataSource(0, 23, localDir + "/test.tif");
-		RasterTileLayer rasterLayer = new RasterTileLayer(dataSource);
-		mapView.getLayers().add(rasterLayer);
-		
-		// Calculate zoom bias, basically this is needed to 'undo' automatic DPI scaling, we will display original raster with close to 1:1 pixel density
-		double zoomLevelBias = Math.log(mapView.getOptions().getDPI() / 160) / Math.log(2);
-		rasterLayer.setZoomLevelBias((float) zoomLevelBias);
-
-		// Find GDAL layer bounds
-		MapBounds bounds = dataSource.getDataExtent();
-
-        // Fit to bounds
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int height = displaymetrics.heightPixels;
-        int width = displaymetrics.widthPixels;
-
-        mapView.moveToFitBounds(bounds,
-                new ScreenBounds(new ScreenPos(0, 0), new ScreenPos(width, height)), false, 0.0f);
-	}
-	
 	void testVector(MapView mapView) {
 		Projection proj = new EPSG3857();
         
@@ -270,7 +236,6 @@ public class MainActivity extends Activity {
         VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("osmbright.zip");
         mapView.getLayers().add(baseLayer);
 
-        testRaster(mapView);
-//      testVector(mapView);
+        testVector(mapView);
     }
 }

@@ -1,4 +1,4 @@
-package com.nutiteq.hellomap3;
+package com.nutiteq.gismap3;
 
 import java.io.File;
 import java.io.FileOutputStream;
