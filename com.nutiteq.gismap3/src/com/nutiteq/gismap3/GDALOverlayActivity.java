@@ -18,6 +18,9 @@ import com.nutiteq.projections.EPSG3857;
 import com.nutiteq.ui.MapView;
 import com.nutiteq.utils.Log;
 
+/**
+ * A sample showing how to display GeoTiff overlay using GDALRasterTileDataSource.
+ */
 public class GDALOverlayActivity extends Activity {
 	
     static {

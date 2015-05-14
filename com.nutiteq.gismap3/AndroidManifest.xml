@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="22" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -24,6 +24,9 @@
         </activity>
         <activity android:name="com.nutiteq.gismap3.OGROverlayActivity" />
         <activity android:name="com.nutiteq.gismap3.GDALOverlayActivity" />
+        <activity android:name="com.nutiteq.gismap3.BasicEditableOverlayActivity" />
+        <activity android:name="com.nutiteq.gismap3.EditableLocalOverlayActivity" />
+        <activity android:name="com.nutiteq.gismap3.EditableOGROverlayActivity" />
         <activity android:name="com.nutiteq.filepicker.FilePicker" />
     </application>
 

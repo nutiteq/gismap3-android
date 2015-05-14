@@ -23,6 +23,9 @@ public class LauncherList extends ListActivity{
     private Object[][] samples={
             {OGROverlayActivity.class,null},
             {GDALOverlayActivity.class,null},
+            {BasicEditableOverlayActivity.class,null},
+            {EditableLocalOverlayActivity.class,null},
+            {EditableOGROverlayActivity.class,null},
     };
 
     @Override

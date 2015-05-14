@@ -44,6 +44,9 @@ import com.nutiteq.vectorelements.BalloonPopup;
 import com.nutiteq.vectorelements.Marker;
 import com.nutiteq.wrappedcommons.StringMap;
 
+/**
+ * A sample showing how to use OGRVectorDataSource, style selectors and custom element meta data.
+ */
 public class OGROverlayActivity extends Activity {
 	
     static {
