@@ -36,6 +36,11 @@ namespace HelloMap
 			SetContentView (Resource.Layout.Main);
 			var mapView = (MapView)FindViewById (Resource.Id.mapView);
 
+			// Create base layer
+			TileDataSource dataSource = new HTTPTileDataSource(0, 18, "http://kaart.maakaart.ee/osm/tiles/1.0.0/osm_noname_EPSG900913/{zoom}/{x}/{yflipped}.png");
+			RasterTileLayer mapLayer = new RasterTileLayer(dataSource);
+			mapView.Layers.Add(mapLayer);
+
 			// Create package manager folder (Platform-specific)
 			var packageFolder = new File (GetExternalFilesDir(null), "gismap_temp");
 			if (!(packageFolder.Mkdirs() || packageFolder.IsDirectory)) {
