@@ -52,6 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MapListener.cs" />
+    <Compile Include="PackageListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -70,13 +71,19 @@
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <AndroidAsset Include="Assets\Icon.png" />
-    <AndroidAsset Include="Assets\bina_polyon.dbf" />
-    <AndroidAsset Include="Assets\bina_polyon.prj" />
-    <AndroidAsset Include="Assets\bina_polyon.shp" />
-    <AndroidAsset Include="Assets\bina_polyon.shx" />
     <AndroidAsset Include="Assets\osmbright.zip" />
+    <AndroidAsset Include="Assets\maps\ne_110m_populated_places.dbf" />
+    <AndroidAsset Include="Assets\maps\ne_110m_populated_places.prj" />
+    <AndroidAsset Include="Assets\maps\ne_110m_populated_places.README.html" />
+    <AndroidAsset Include="Assets\maps\ne_110m_populated_places.shp" />
+    <AndroidAsset Include="Assets\maps\ne_110m_populated_places.shx" />
+    <AndroidAsset Include="Assets\maps\ne_110m_populated_places.VERSION.txt" />
+    <AndroidAsset Include="Assets\maps\Adm.dat" />
+    <AndroidAsset Include="Assets\maps\Adm.id" />
+    <AndroidAsset Include="Assets\maps\Adm.map" />
+    <AndroidAsset Include="Assets\maps\Adm.tab" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidNativeLibrary Include="armeabi-v7a\libproj.so" />
+    <Folder Include="Assets\maps\" />
   </ItemGroup>
 </Project>

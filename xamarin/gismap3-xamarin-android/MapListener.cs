@@ -65,7 +65,10 @@ namespace HelloMap
 			styleBuilder.PlacementPriority = 10;
 
 			var vectorElement = clickInfo.VectorElement;
-//			var clickText = vectorElement.GetMetaDataElement("ClickText");
+
+			if (vectorElement is BalloonPopup) {
+				return;
+			}
 
 			var stringMap = vectorElement.GetMetaData();
 			StringBuilder msgBuilder = new StringBuilder ();
