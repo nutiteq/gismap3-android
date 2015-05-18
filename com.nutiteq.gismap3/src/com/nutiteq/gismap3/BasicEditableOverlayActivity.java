@@ -194,7 +194,7 @@ public class BasicEditableOverlayActivity extends Activity {
         Log.setShowError(true);
         
         // Get your own license from developer.nutiteq.com
-        MapView.registerLicense("XTUN3Q0ZBd2NtcmFxbUJtT1h4QnlIZ2F2ZXR0Mi9TY2JBaFJoZDNtTjUvSjJLay9aNUdSVjdnMnJwVXduQnc9PQoKcHJvZHVjdHM9c2RrLWlvcy0zLiosc2RrLWFuZHJvaWQtMy4qCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLioKYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS4qCndhdGVybWFyaz1ldmFsdWF0aW9uCnVzZXJLZXk9MTVjZDkxMzEwNzJkNmRmNjhiOGE1NGZlZGE1YjA0OTYK", getApplicationContext());
+        MapView.registerLicense(getString(R.string.license_code), getApplicationContext());
 
         // Create map view 
         MapView mapView = (MapView) this.findViewById(R.id.map_view);

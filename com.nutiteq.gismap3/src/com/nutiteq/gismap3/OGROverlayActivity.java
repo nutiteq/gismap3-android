@@ -81,7 +81,7 @@ public class OGROverlayActivity extends Activity {
 				    Log.debug(""+stringMap.get_key(i)+" = "+stringMap.get(stringMap.get_key(i)));
 					msgBuilder.append(stringMap.get_key(i));
 					msgBuilder.append("=");
-					msgBuilder.append(fixTurkish(stringMap.get(stringMap.get_key(i))));
+					msgBuilder.append(stringMap.get(stringMap.get_key(i)));
 					msgBuilder.append("\n");
 				}
 				BalloonPopupStyleBuilder styleBuilder = new BalloonPopupStyleBuilder();
@@ -93,15 +93,6 @@ public class OGROverlayActivity extends Activity {
 				popupDataSource.add(clickPopup);
 			}
 		}
-	}
-	
-	private static String fixTurkish(String in){
-	    return in.replaceAll("??????", "??????")
-	            .replaceAll("??????", "??????")
-	            .replaceAll("??????", "??????")
-	            .replaceAll("??????", "??????")
-	            .replaceAll("??????", "??????")
-	            .replaceAll("??????", "??????");
 	}
 	
 	private LocalVectorDataSource popupDataSource;
@@ -221,7 +212,7 @@ public class OGROverlayActivity extends Activity {
         Log.setShowError(true);
         
         // Get your own license from developer.nutiteq.com
-        MapView.registerLicense("XTUN3Q0ZBd2NtcmFxbUJtT1h4QnlIZ2F2ZXR0Mi9TY2JBaFJoZDNtTjUvSjJLay9aNUdSVjdnMnJwVXduQnc9PQoKcHJvZHVjdHM9c2RrLWlvcy0zLiosc2RrLWFuZHJvaWQtMy4qCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLioKYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS4qCndhdGVybWFyaz1ldmFsdWF0aW9uCnVzZXJLZXk9MTVjZDkxMzEwNzJkNmRmNjhiOGE1NGZlZGE1YjA0OTYK", getApplicationContext());
+        MapView.registerLicense(getString(R.string.license_code), getApplicationContext());
 
         // 1. Basic map setup
         // Create map view 
