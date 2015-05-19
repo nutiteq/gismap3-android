@@ -27,6 +27,7 @@
         <activity android:name="com.nutiteq.gismap3.BasicEditableOverlayActivity" />
         <activity android:name="com.nutiteq.gismap3.EditableLocalOverlayActivity" />
         <activity android:name="com.nutiteq.gismap3.EditableOGROverlayActivity" />
+        <activity android:name="com.nutiteq.gismap3.MapInfoOverlayActivity" />
         <activity android:name="com.nutiteq.filepicker.FilePicker" />
     </application>
 

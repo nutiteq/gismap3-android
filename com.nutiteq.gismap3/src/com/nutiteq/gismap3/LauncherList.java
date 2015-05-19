@@ -26,6 +26,7 @@ public class LauncherList extends ListActivity{
             {BasicEditableOverlayActivity.class,null},
             {EditableLocalOverlayActivity.class,null},
             {EditableOGROverlayActivity.class,null},
+            {MapInfoOverlayActivity.class,null},
     };
 
     @Override
