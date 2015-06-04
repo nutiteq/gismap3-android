@@ -37,8 +37,10 @@ import com.nutiteq.layers.Layer;
 import com.nutiteq.layers.RasterTileLayer;
 import com.nutiteq.geometry.Geometry;
 import com.nutiteq.geometry.LineGeometry;
+import com.nutiteq.geometry.MultiGeometry;
 import com.nutiteq.geometry.PointGeometry;
 import com.nutiteq.geometry.PolygonGeometry;
+import com.nutiteq.vectorelements.GeometryCollection;
 import com.nutiteq.vectorelements.Line;
 import com.nutiteq.vectorelements.Point;
 import com.nutiteq.vectorelements.Polygon;
@@ -558,7 +560,10 @@ public abstract class EditableOverlayActivityBase extends Activity {
 		}
 		if (element instanceof Polygon && geometry instanceof PolygonGeometry) {
 			((Polygon) element).setGeometry((PolygonGeometry) geometry);
-		}    	
+		}
+		if (element instanceof GeometryCollection && geometry instanceof MultiGeometry) {
+			((GeometryCollection) element).setGeometry((MultiGeometry) geometry);
+		}
     }
 
     private void addElementPoint(VectorElement element) {
