@@ -12,6 +12,8 @@
 bin/
 gen/
 
+obj/
+
 # Gradle files
 .gradle/
 build/
@@ -26,3 +28,6 @@ proguard/
 *.log
 
 .DS_Store
+
+# User preferences
+*.userprefs
