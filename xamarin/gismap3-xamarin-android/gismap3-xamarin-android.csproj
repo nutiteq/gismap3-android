@@ -15,7 +15,7 @@
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <AssemblyName>HelloMap</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -68,10 +68,9 @@
     <AndroidResource Include="Resources\drawable-xxhdpi\Icon.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\Icon.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
     <AndroidAsset Include="Assets\Icon.png" />
-    <AndroidAsset Include="Assets\osmbright.zip" />
     <AndroidAsset Include="Assets\maps\ne_110m_populated_places.dbf" />
     <AndroidAsset Include="Assets\maps\ne_110m_populated_places.prj" />
     <AndroidAsset Include="Assets\maps\ne_110m_populated_places.README.html" />
@@ -82,6 +81,7 @@
     <AndroidAsset Include="Assets\maps\Adm.id" />
     <AndroidAsset Include="Assets\maps\Adm.map" />
     <AndroidAsset Include="Assets\maps\Adm.tab" />
+    <AndroidAsset Include="Assets\nutibright-v3.zip" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\maps\" />

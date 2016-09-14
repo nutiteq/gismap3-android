@@ -25,91 +25,100 @@ namespace HelloMap
 	[Activity (Label = "Hellomap", MainLauncher = true, Icon = "@drawable/icon")]
 	public class MainActivity : Activity
 	{
-			
+		const string mapFolder = "maps";
 
-		protected override void OnCreate (Bundle bundle)
+		const string License = "XTUMwQ0ZRQ0ZRc2FRYnZWNGhNNEkxbFhjY3IvbGRSdHNLd0lVQjM4S3ZtNG44ZnIxR0tnWS9PYkdWL" +
+			"2llYlNFPQoKcHJvZHVjdHM9c2RrLXhhbWFyaW4taW9zLTMuKixzZGsteGFtYXJpbi1hbmRyb2lkLTMuKixzZGstZ2lzZXh0ZW" +
+			"5zaW9uCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLmhlbGxvbWFwLnhhbWFyaW4KYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXR" +
+			"lcS5oZWxsb21hcC54YW1hcmluCndhdGVybWFyaz1udXRpdGVxCnZhbGlkVW50aWw9MjAxNS0wNi0wMQp1c2VyS2V5PTJhOWU5" +
+			"Zjc0NjJjZWY0ODFiZTJhOGMxMjYxZmU2Y2JkCg==";
+
+		protected override void OnCreate(Bundle savedInstanceState)
 		{
-			base.OnCreate (bundle);
+			base.OnCreate(savedInstanceState);
 
 			// force Java to load PROJ.4 library. Needed as we don't call it directly, but 
 			// OGR datasource reading may need it.
-
 			//Java.Lang.JavaSystem.LoadLibrary("proj");
 
 			// Register license
-			Nutiteq.Utils.Log.ShowError = true;
-			Nutiteq.Utils.Log.ShowWarn = true;
-			//Nutiteq.Utils.Log.ShowDebug = true;
+			Log.ShowError = true;
+			Log.ShowWarn = true;
+			Log.ShowDebug = true;
 
-			//var licenseOk = MapView.RegisterLicense("XTUMwQ0ZRQ0ZRc2FRYnZWNGhNNEkxbFhjY3IvbGRSdHNLd0lVQjM4S3ZtNG44ZnIxR0tnWS9PYkdWL2llYlNFPQoKcHJvZHVjdHM9c2RrLXhhbWFyaW4taW9zLTMuKixzZGsteGFtYXJpbi1hbmRyb2lkLTMuKixzZGstZ2lzZXh0ZW5zaW9uCnBhY2thZ2VOYW1lPWNvbS5udXRpdGVxLmhlbGxvbWFwLnhhbWFyaW4KYnVuZGxlSWRlbnRpZmllcj1jb20ubnV0aXRlcS5oZWxsb21hcC54YW1hcmluCndhdGVybWFyaz1udXRpdGVxCnZhbGlkVW50aWw9MjAxNS0wNi0wMQp1c2VyS2V5PTJhOWU5Zjc0NjJjZWY0ODFiZTJhOGMxMjYxZmU2Y2JkCg==", ApplicationContext);
-			//Log.Info ("License ok = " + licenseOk);
+			MapView.RegisterLicense(License, ApplicationContext);
+
 			// Set our view from the "main" layout resource
-			SetContentView (Resource.Layout.Main);
-			var mapView = (MapView)FindViewById (Resource.Id.mapView);
+			SetContentView(Resource.Layout.Main);
+
+			var mapView = (MapView)FindViewById(Resource.Id.mapView);
 
 			mapView.Zoom = 2;
 
-			mapView.Layers.Add(new RasterTileLayer(new HTTPTileDataSource(1,18,"http://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.png?g=1&mkt=en-US&shading=hill&n=z")));
+			string url = "http://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.png?g=1&mkt=en-US&shading=hill&n=z";
+			mapView.Layers.Add(new RasterTileLayer(new HTTPTileDataSource(1, 18, url)));
 
-			// Now can add vector map as layer
-			// define styling for vector map
-			UnsignedCharVector styleBytes = AssetUtils.LoadBytes("osmbright.zip");
+			// Now can add vector map as layer. Define styling for vector map
+			UnsignedCharVector styleBytes = AssetUtils.LoadBytes("nutibright-v3.zip");
 			MBVectorTileDecoder vectorTileDecoder = null;
-			if (styleBytes != null) {
+
+			if (styleBytes != null)
+			{
 				// Create style set
-				var vectorTileStyleSet = new MBVectorTileStyleSet (styleBytes);
-				vectorTileDecoder = new MBVectorTileDecoder (vectorTileStyleSet);
-			} else {
-				Log.Error ("Failed to load style data");
+				var vectorTileStyleSet = new MBVectorTileStyleSet(styleBytes);
+				vectorTileDecoder = new MBVectorTileDecoder(vectorTileStyleSet);
 			}
-
-
-//			VectorTileLayer baseLayer = new NutiteqOnlineVectorTileLayer("osmbright.zip");
-
-		//	var dataSource = new NutiteqOnlineTileDataSource("nutiteq.osm");
-		//	var dataSource = new HTTPTileDataSource (0, 14, "http://up1.nutiteq.com/v1/nutiteq.mbstreets/{zoom}/{x}/{y}.vt?user_key=15cd9131072d6df68b8a54feda5b0496");
-
-		//	var baseLayer = new VectorTileLayer(dataSource, vectorTileDecoder);
-		//	mapView.Layers.Add(baseLayer);
-
+			else {
+				Alert("Failed to load style data");
+			}
 
 			/**** offline package map ****/
 
 			// Create/find folder for packages
-			var packageFolder = new File (GetExternalFilesDir(null), "packages");
-			if (!(packageFolder.Mkdirs() || packageFolder.IsDirectory)) {
-				Log.Fatal("Could not create package folder!");
+			var packageFolder = new File(GetExternalFilesDir(null), "packages");
+
+			if (!(packageFolder.Mkdirs() || packageFolder.IsDirectory))
+			{
+				Alert("Could not create package folder!");
 			}
+
 			var packageManager = new NutiteqPackageManager("nutiteq.mbstreets", packageFolder.AbsolutePath);
 			packageManager.PackageManagerListener = new PackageListener(packageManager);
-			packageManager.Start ();
+			packageManager.Start();
 
-			// Töbi, Sweden: 17.9776,59.4019,18.1574,59.5213
-			// London (30MB): bbox(-0.8164,51.2382,0.6406,51.7401)
-			var bbox = "bbox(17.9776,59.4019,18.1574,59.5213)";
-			if (packageManager.GetLocalPackage(bbox) == null) {
-				var resultOK = packageManager.StartPackageDownload (bbox);
+			string tobi = "bbox(17.9776,59.4019,18.1574,59.5213)";
+			//string london = "bbox(-0.8164,51.2382,0.6406,51.7401)";
+			var bbox = tobi;
+
+			if (packageManager.GetLocalPackage(bbox) == null)
+			{
+				packageManager.StartPackageDownload(bbox);
 			}
 
-			var baseLayer = new VectorTileLayer(new PackageManagerTileDataSource(packageManager),vectorTileDecoder);
+			var baseLayer = new VectorTileLayer(new PackageManagerTileDataSource(packageManager), vectorTileDecoder);
 			mapView.Layers.Add(baseLayer);
 
 			// Copy bundled tile data to file system, so it can be imported by package manager
-			var mapAsset = "maps";
-			var assetFiles = Assets.List(mapAsset);
-			var dir = GetExternalFilesDir(null);
+			string[] mapAssets = Assets.List(mapFolder);
+			File directory = GetExternalFilesDir(null);
 
-			foreach (string fileName in assetFiles) {
-				string importPath = new File (dir, fileName).AbsolutePath;
-				try{
-					using (var input = Assets.Open (mapAsset+"/"+fileName)) {
-						using (var output = new System.IO.FileStream (importPath, System.IO.FileMode.Create)) {
-							Log.Info ("copy " + mapAsset+"/"+fileName +" to "+importPath);
-							input.CopyTo (output);
+			foreach (string fileName in mapAssets)
+			{
+				string importPath = new File(directory, fileName).AbsolutePath;
+
+				try
+				{
+					using (var input = Assets.Open(mapFolder + "/" + fileName))
+					{
+						using (var output = new System.IO.FileStream(importPath, System.IO.FileMode.Create))
+						{
+							input.CopyTo(output);
 						}
 					}
-				}catch(IOException){
-					Log.Info ("IOException " + fileName);
+				}
+				catch (IOException)
+				{
+					Log.Info("IOException " + fileName);
 				}
 			}
 
@@ -117,56 +126,59 @@ namespace HelloMap
 			var proj = new EPSG3857();
 			mapView.Options.BaseProjection = proj; // note: EPSG3857 is the default, so this is actually not required
 
-			var lineStyleBuilder = new LineStyleBuilder ();
-			lineStyleBuilder.Color = new Color (0, 0, 0, 255);
+			var lineStyleBuilder = new LineStyleBuilder();
+			lineStyleBuilder.Color = new Color(0, 0, 0, 255);
 			lineStyleBuilder.Width = 2;
 
 			var polygonStyleBuilder = new PolygonStyleBuilder();
 			polygonStyleBuilder.Color = new Color(255, 0, 255, 255);
-			polygonStyleBuilder.LineStyle = lineStyleBuilder.BuildStyle ();
+			polygonStyleBuilder.LineStyle = lineStyleBuilder.BuildStyle();
 			var polygonStyle = polygonStyleBuilder.BuildStyle();
-
-			var psb = new PointStyleBuilder ();
-			psb.Color = new Color (Android.Graphics.Color.Fuchsia);
-			psb.Size = 4.0f;
-			var pointStyle = psb.BuildStyle ();
 
 			// Create style selector.
 			// Style selectors allow to assign styles based on element attributes and view parameters (zoom, for example)
 			// Style filter expressions are given in a simple SQL-like language.
 			StyleSelectorBuilder styleSelectorBuilder = new StyleSelectorBuilder();
 			styleSelectorBuilder.AddRule(polygonStyle);
-//			styleSelectorBuilder.AddRule(pointStyle);
-
+						
 			StyleSelector styleSelector = styleSelectorBuilder.BuildSelector();
 
 			// Create data source. Use constructed style selector and copied shape file containing points.
+			string shpPath = new File(directory, "Adm.tab").AbsolutePath;
 
-			string shpPath = new File (dir, "Adm.tab").AbsolutePath;
-			Log.Info ("opening " + shpPath);
 			OGRVectorDataSource ogrDataSource = new OGRVectorDataSource(proj, styleSelector, shpPath);
 			VectorLayer ogrLayer = new VectorLayer(ogrDataSource);
-			ogrDataSource.GeometrySimplifier = new Nutiteq.Geometry.DouglasPeuckerGeometrySimplifier (0.05f);
-		//	ogrLayer.VisibleZoomRange = new MapRange (18, 20);
+
+			ogrDataSource.GeometrySimplifier = new Nutiteq.Geometry.DouglasPeuckerGeometrySimplifier(0.05f);
 			mapView.Layers.Add(ogrLayer);
 
 			// Zoom in to the actual data
-			MapBounds bounds = ogrDataSource.DataExtent;
-			Log.Info ("data bounds: " + bounds.ToString());
-			Android.Util.DisplayMetrics displaymetrics = new Android.Util.DisplayMetrics();
-			WindowManager.DefaultDisplay.GetMetrics(displaymetrics);
-			int height = displaymetrics.HeightPixels;
-			int width = displaymetrics.WidthPixels;
-			ScreenBounds screenBounds = new ScreenBounds (new ScreenPos (0, 0), new ScreenPos (width, height));
-			mapView.MoveToFitBounds(bounds, screenBounds, false, 0.5f);
+			Android.Util.DisplayMetrics metrics = new Android.Util.DisplayMetrics();
+			WindowManager.DefaultDisplay.GetMetrics(metrics);
+
+			int width = metrics.WidthPixels;
+			int height = metrics.HeightPixels;
+
+			ScreenBounds screenBounds = new ScreenBounds(new ScreenPos(0, 0), new ScreenPos(width, height));
+			MapBounds mapBounds = ogrDataSource.DataExtent;
+
+			mapView.MoveToFitBounds(mapBounds, screenBounds, false, 0.5f);
 
 			// Create overlay layer for markers
-			var dataSourceOverlay = new LocalVectorDataSource (proj);
-			var overlayLayer = new VectorLayer (dataSourceOverlay);
-			mapView.Layers.Add (overlayLayer);
-		
-			mapView.MapEventListener = new MapListener (dataSourceOverlay, mapView);
+			var dataSourceOverlay = new LocalVectorDataSource(proj);
+			var overlayLayer = new VectorLayer(dataSourceOverlay);
+
+			mapView.Layers.Add(overlayLayer);
+
+			// Add event listener
+			mapView.MapEventListener = new MapListener(dataSourceOverlay, mapView);
 
 		}
+
+		void Alert(string message)
+		{
+			Toast.MakeText(this, message, ToastLength.Short).Show();
+		}
+
 	}
 }
